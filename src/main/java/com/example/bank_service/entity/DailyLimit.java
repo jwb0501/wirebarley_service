@@ -22,10 +22,10 @@ public class DailyLimit {
     @Column(nullable = false)
     private LocalDate date;
 
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false)
     private String accountNumber;
 
-    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private TransactionType transactionType;
 
     @Column(nullable = false)
