@@ -1,5 +1,6 @@
 package com.example.bank_service.service;
 
+import com.example.bank_service.dto.ApiResponse;
 import com.example.bank_service.enums.ErrorCode;
 import com.example.bank_service.enums.TransactionType;
 import com.example.bank_service.entity.Account;
@@ -32,7 +33,7 @@ public class AccountService {
     @Transactional
     public Account createAccount(String accountNumber, BigDecimal balance){
         if(accountRepo.existsByAccountNumber(accountNumber)){
-            throw new ApiException(ErrorCode.ACCOUNT_ALREADY_EXISTS);
+            throw new ApiException(ErrorCode.DUPLICATE_ACCOUNT);
         }
 
         Account account = Account.builder()
@@ -89,11 +90,11 @@ public class AccountService {
                 .orElseThrow(() -> new ApiException(ErrorCode.ACCOUNT_NOT_FOUND));
 
         if (amount.compareTo(new BigDecimal("1000000")) > 0) {
-            throw new ApiException(ErrorCode.EXCEED_DAILY_LIMIT);
+            throw new ApiException(ErrorCode.EXCEEDS_WITHDRAW_LIMIT);
         }
 
         if (account.getBalance().compareTo(amount) < 0) {
-            throw new ApiException(ErrorCode.INSUFFICIENT_BALANCE);
+            throw new ApiException(ErrorCode.INSUFFICIENT_FUNDS);
         }
 
         account.setBalance(account.getBalance().subtract(amount));
@@ -120,7 +121,7 @@ public class AccountService {
         BigDecimal limit = new BigDecimal("3000000");
 
         if (todayTotal.add(totalAmount).compareTo(limit) > 0) {
-            throw new ApiException(ErrorCode.EXCEED_DAILY_LIMIT);
+            throw new ApiException(ErrorCode.EXCEEDS_TRANSFER_LIMIT);
         }
 
         Account from = accountRepo.findByAccountNumber(fromAccountNumber)
@@ -129,7 +130,7 @@ public class AccountService {
                 .orElseThrow(() -> new ApiException(ErrorCode.ACCOUNT_NOT_FOUND));
 
         if (from.getBalance().compareTo(totalAmount) < 0) {
-            throw new ApiException(ErrorCode.INSUFFICIENT_BALANCE);
+            throw new ApiException(ErrorCode.INSUFFICIENT_FUNDS);
         }
 
         from.setBalance(from.getBalance().subtract(totalAmount));
