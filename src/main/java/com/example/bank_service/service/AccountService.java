@@ -88,12 +88,16 @@ public class AccountService {
         Account account = accountRepo.findByAccountNumber(accountNumber)
                 .orElseThrow(() -> new ApiException(ErrorCode.ACCOUNT_NOT_FOUND));
 
-        if (amount.compareTo(new BigDecimal("1000000")) > 0) {
-            throw new ApiException(ErrorCode.EXCEEDS_WITHDRAW_LIMIT);
-        }
-
         if (account.getBalance().compareTo(amount) < 0) {
             throw new ApiException(ErrorCode.INSUFFICIENT_FUNDS);
+        }
+
+        // 1일 출금 총액 확인
+        BigDecimal dailyWithdrawTotal = dailyLimitService.getTodayTotal(accountNumber, TransactionType.WITHDRAW);
+        BigDecimal newTotal = dailyWithdrawTotal.add(amount);
+
+        if (newTotal.compareTo(new BigDecimal("1000000")) > 0) {
+            throw new ApiException(ErrorCode.EXCEEDS_WITHDRAW_LIMIT);
         }
 
         account.setBalance(account.getBalance().subtract(amount));
@@ -121,10 +125,6 @@ public class AccountService {
         BigDecimal todayTotal = dailyLimitService.getTodayTotal(fromAccountNumber, TransactionType.TRANSFER);
         BigDecimal limit = new BigDecimal("3000000");
 
-        if (todayTotal.add(totalAmount).compareTo(limit) > 0) {
-            throw new ApiException(ErrorCode.EXCEEDS_TRANSFER_LIMIT);
-        }
-
         Account from = accountRepo.findByAccountNumber(fromAccountNumber)
                 .orElseThrow(() -> new ApiException(ErrorCode.ACCOUNT_NOT_FOUND));
         Account to = accountRepo.findByAccountNumber(toAccountNumber)
@@ -132,6 +132,10 @@ public class AccountService {
 
         if (from.getBalance().compareTo(totalAmount) < 0) {
             throw new ApiException(ErrorCode.INSUFFICIENT_FUNDS);
+        }
+
+        if (todayTotal.add(totalAmount).compareTo(limit) > 0) {
+            throw new ApiException(ErrorCode.EXCEEDS_TRANSFER_LIMIT);
         }
 
         from.setBalance(from.getBalance().subtract(totalAmount));
