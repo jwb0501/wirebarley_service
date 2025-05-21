@@ -100,6 +100,8 @@ public class AccountService {
 
         accountRepo.save(account);
 
+        dailyLimitService.addAmount(accountNumber, TransactionType.WITHDRAW, amount);
+
         // 거래내역 저장
         transactionService.saveLog(accountNumber, TransactionType.WITHDRAW, amount, account.getBalance(), null);
     }
