@@ -39,4 +39,7 @@ public class Account {
 
     private LocalDateTime deletedAt;
 
+    @Version
+    private Long version;
+
 }

@@ -1,6 +1,5 @@
 package com.example.bank_service.service;
 
-import com.example.bank_service.dto.ApiResponse;
 import com.example.bank_service.enums.ErrorCode;
 import com.example.bank_service.enums.TransactionType;
 import com.example.bank_service.entity.Account;

@@ -28,6 +28,7 @@ public class TransactionService {
                         .amount(amount)
                         .balanceAfter(balanceAfter)
                         .transactionAt(LocalDateTime.now())
+                        .counterpartyAccount(counterpartyAccount)
                         .build()
         );
     }
