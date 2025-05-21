@@ -1,6 +1,8 @@
 package com.example.bank_service.controller;
 
+import com.example.bank_service.dto.ApiResponse;
 import com.example.bank_service.entity.Transaction;
+import com.example.bank_service.enums.SuccessCode;
 import com.example.bank_service.service.TransactionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,8 +20,14 @@ public class TransactionController {
 
     private final TransactionService transactionService;
 
+    /**
+     * 계좌 조회
+     * 내역 최신순
+     * @param accountNumber
+     * @return
+     */
     @GetMapping("/{accountNumber}/transactions")
-    public ResponseEntity<List<Transaction>> getTransactions(@PathVariable String accountNumber) {
-        return ResponseEntity.ok(transactionService.getTransactions(accountNumber));
+    public ResponseEntity<ApiResponse<List<Transaction>>> getTransactions(@PathVariable String accountNumber) {
+        return ResponseEntity.ok(ApiResponse.ok(SuccessCode.FETCH_SUCCESS,transactionService.getTransactions(accountNumber)));
     }
 }
